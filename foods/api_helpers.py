@@ -1,7 +1,7 @@
 import requests
 from django.conf import settings
 
-from foods.exceptions import RemoteServiceUnavailable
+from foods.exceptions import RemoteServiceUnavailable, HttpBadRequest
 
 
 def get_recipients():
@@ -34,19 +34,29 @@ def get_product_by_id(pk):
 def get_products_by_param(min_price, min_weight):
     products = get_products()
 
+    min_price, min_weight = _parse(min_price, min_weight)
+
     if min_price and min_weight:
         return [
             product for product in products
-            if product['price'] >= int(min_price) and product['weight'] >= int(min_weight)
+            if product['price'] >= min_price and product['weight'] >= min_weight
         ]
     elif min_price:
         return [
-            product for product in products if product['price'] >= int(min_price)
+            product for product in products if product['price'] >= min_price
         ]
     else:
         return [
-            product for product in products if product['weight'] >= int(min_weight)
+            product for product in products if product['weight'] >= min_weight
         ]
+
+
+def _parse(min_price, min_weight):
+    try:
+        return int(min_price) if min_price else None, \
+               int(min_weight) if min_weight else None,
+    except ValueError:
+        raise HttpBadRequest()
 
 
 def _crop_recipient(recipient):
