@@ -6,7 +6,7 @@ SECRET_KEY = '9+#50gd4$c7vgpf$&d(^x^m#-$n+qab=w&mq4s%+=s5ba5mo%4'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 FOOD_API_URL = 'https://stepik.org/media/attachments/course/73594/foodboxes.json'
 RECIPIENTS_API_URL = 'https://stepik.org/media/attachments/course/73594/recipients.json'
