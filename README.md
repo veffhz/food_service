@@ -16,6 +16,9 @@
 ##### initialize database
 `python manage.py migrate`
 
+##### run tests:
+run `python manage.py test`
+
 ##### run app:
 run `gunicorn food_project.wsgi`
 
