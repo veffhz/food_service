@@ -1,41 +1,65 @@
 import requests
 from django.conf import settings
 
+from foods.exceptions import RemoteServiceUnavailable
+
 
 def get_recipients():
-    response = requests.get(settings.RECIPIENTS_API_URL)
-    return [crop_recipient(recipient) for recipient in response.json()]
+    return [_crop_recipient(recipient) for recipient in get_full_recipients()]
 
 
 def get_full_recipients():
-    response = requests.get(settings.RECIPIENTS_API_URL)
-    return [recipient for recipient in response.json()]
+    try:
+        return requests.get(settings.RECIPIENTS_API_URL).json()
+    except requests.exceptions.RequestException:
+        raise RemoteServiceUnavailable()
 
 
-def get_foods():
-    response = requests.get(settings.FOOD_API_URL)
-    return [crop_food(recipient) for recipient in response.json()]
+def get_full_products():
+    try:
+        return requests.get(settings.FOOD_API_URL).json()
+    except requests.exceptions.RequestException:
+        raise RemoteServiceUnavailable()
 
 
-def get_full_foods():
-    response = requests.get(settings.FOOD_API_URL)
-    return [recipient for recipient in response.json()]
+def get_products():
+    return [_crop_product(product) for product in get_full_products()]
 
 
-def get_food_by_id(pk):
-    return next((crop_food(food) for food in get_full_foods()
-                 if food['inner_id'] == pk), None)
+def get_product_by_id(pk):
+    return next((_crop_product(product) for product in get_full_products()
+                 if product['inner_id'] == pk), None)
 
 
-def crop_recipient(recipient):
+def get_products_by_param(min_price, min_weight):
+    products = get_products()
+
+    if min_price and min_weight:
+        return [
+            product for product in products
+            if product['price'] >= int(min_price) and product['weight'] >= int(min_weight)
+        ]
+    elif min_price:
+        return [
+            product for product in products if product['price'] >= int(min_price)
+        ]
+    else:
+        return [
+            product for product in products if product['weight'] >= int(min_weight)
+        ]
+
+
+def _crop_recipient(recipient):
     return {
         **recipient['info'],
         'phoneNumber': recipient['contacts']['phoneNumber'],
     }
 
 
-def crop_food(food):
+def _crop_product(product):
     return {
-        'title': food['name'],
-        'description': food['about'],
+        'title': product['name'],
+        'description': product['about'],
+        'price': product['price'],
+        'weight': product['weight_grams'],
     }

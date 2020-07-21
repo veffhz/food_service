@@ -1,9 +1,12 @@
-from django.http import HttpResponseBadRequest, Http404
+from django.http import Http404
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from foods.api_helpers import get_recipients
-from foods.api_helpers import get_foods, get_food_by_id
+from foods.api_helpers import (
+    get_products, get_product_by_id, get_products_by_param
+)
 
 
 @api_view(http_method_names=['GET'])
@@ -23,24 +26,23 @@ def recipient_detail(request, pk):
 
 @api_view(http_method_names=['GET'])
 def product_sets(request):
-    foods = get_foods()
-
     if request.query_params:
-        recipient_id = request.query_params.get('recipient_id')
+        min_price = request.query_params.get('min_price')
+        min_weight = request.query_params.get('min_weight')
 
-        if not recipient_id:
-            raise HttpResponseBadRequest
+        if not min_price and not min_weight:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response([])
+        return Response(get_products_by_param(min_price, min_weight))
     else:
-        return Response(foods)
+        return Response(get_products())
 
 
 @api_view(http_method_names=['GET'])
 def product_detail(request, pk):
-    food = get_food_by_id(pk)
+    product = get_product_by_id(pk)
 
-    if food:
-        return Response(food)
+    if product:
+        return Response(product)
     else:
         raise Http404
