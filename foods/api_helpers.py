@@ -34,15 +34,15 @@ def get_product_by_id(pk):
 def get_products_by_param(min_price, min_weight):
     min_price, min_weight = _parse(min_price, min_weight)
 
-    products = get_products()
-
     if min_price:
         return [
-            product for product in products if product['price'] >= min_price
+            product for product in get_products()
+            if product['price'] >= min_price
         ]
     else:
         return [
-            product for product in products if product['weight'] >= min_weight
+            product for product in get_products()
+            if product['weight'] >= min_weight
         ]
 
 

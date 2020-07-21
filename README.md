@@ -13,14 +13,11 @@
 ##### install requirements:
 `pip3 install -r requirements.txt`
 
-##### initialize database
-`python manage.py migrate`
-
 ##### run tests:
-run `python manage.py test`
+`python manage.py test`
 
 ##### run app:
-run `gunicorn food_project.wsgi`
+`gunicorn food_project.wsgi`
 
 ##### usage:
  - http://localhost:8000/recipients/
