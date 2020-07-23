@@ -1,67 +1,74 @@
 import requests
+from dataclasses import dataclass
 from django.conf import settings
 
 from foods.exceptions import RemoteServiceUnavailable, HttpBadRequest
 
 
-def get_recipients():
+@dataclass
+class Params:
+    min_price: int
+    min_weight: int
+
+
+def get_recipients() -> list:
     return [_crop_recipient(recipient) for recipient in get_full_recipients()]
 
 
-def get_full_recipients():
+def get_full_recipients() -> list:
     try:
         return requests.get(settings.RECIPIENTS_API_URL).json()
     except requests.exceptions.RequestException:
         raise RemoteServiceUnavailable()
 
 
-def get_full_products():
+def get_full_products() -> list:
     try:
         return requests.get(settings.FOOD_API_URL).json()
     except requests.exceptions.RequestException:
         raise RemoteServiceUnavailable()
 
 
-def get_products():
+def get_products() -> list:
     return [_crop_product(product) for product in get_full_products()]
 
 
-def get_product_by_id(pk):
+def get_product_by_id(pk: int) -> dict:
     return next((_crop_product(product) for product in get_full_products()
                  if product['inner_id'] == pk), None)
 
 
-def get_products_by_param(min_price, min_weight):
-    min_price, min_weight = _parse(min_price, min_weight)
+def get_products_by_param(min_price: str, min_weight: str) -> list:
+    params = _parse(min_price, min_weight)
 
     if min_price:
         return [
             product for product in get_products()
-            if product['price'] >= min_price
+            if product['price'] >= params.min_price
         ]
     else:
         return [
             product for product in get_products()
-            if product['weight'] >= min_weight
+            if product['weight'] >= params.min_weight
         ]
 
 
-def _parse(min_price, min_weight):
+def _parse(min_price: str, min_weight: str) -> Params:
     try:
-        return int(min_price) if min_price else None, \
-               int(min_weight) if min_weight else None,
+        return Params(int(min_price) if min_price else None,
+                      int(min_weight) if min_weight else None)
     except ValueError:
         raise HttpBadRequest()
 
 
-def _crop_recipient(recipient):
+def _crop_recipient(recipient: dict) -> dict:
     return {
         **recipient['info'],
         'phoneNumber': recipient['contacts']['phoneNumber'],
     }
 
 
-def _crop_product(product):
+def _crop_product(product: dict) -> dict:
     return {
         'title': product['name'],
         'description': product['about'],
