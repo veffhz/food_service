@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 from dataclasses import dataclass
 from django.conf import settings
@@ -5,10 +7,10 @@ from django.conf import settings
 from foods.exceptions import RemoteServiceUnavailable, HttpBadRequest
 
 
-@dataclass
+@dataclass(frozen=True)
 class Params:
-    min_price: int
-    min_weight: int
+    min_price: Optional[int]
+    min_weight: Optional[int]
 
 
 def get_recipients() -> list:
