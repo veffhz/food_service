@@ -22,7 +22,7 @@ class GetAllRecipientsTest(TestCase):
         self.mock_response = Mock(status_code=200)
         self.mock_response.raise_for_status.return_value = None
 
-        with open('data_example/recipients.json', 'r') as f:
+        with open('foods/data/recipients.json', 'r') as f:
             self.mock_response.json.return_value = json.load(f)
         self.mock_request = patcher.start()
         self.mock_request.return_value = self.mock_response
@@ -58,7 +58,7 @@ class GetAllProductsTest(TestCase):
         self.mock_response = Mock(status_code=200)
         self.mock_response.raise_for_status.return_value = None
 
-        with open('data_example/foodboxes.json', 'r') as f:
+        with open('foods/data/foodboxes.json', 'r') as f:
             self.mock_response.json.return_value = json.load(f)
         self.mock_request = patcher.start()
         self.mock_request.return_value = self.mock_response

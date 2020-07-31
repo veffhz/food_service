@@ -17,7 +17,9 @@
 `python manage.py test`
 
 ##### run app:
-`gunicorn food_project.wsgi`
+ - `python manage.py migrate`
+ - `python manage.py import_data`
+ - `gunicorn food_project.wsgi`
 
 ##### usage:
  - http://localhost:8000/recipients/
