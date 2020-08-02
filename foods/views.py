@@ -2,26 +2,19 @@ from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from foods.api_helpers import get_recipients
 from foods.api_helpers import (
     get_products, get_product_by_id, get_products_by_param
 )
 
-
-@api_view(http_method_names=['GET'])
-def recipients_list(request):
-    return Response(get_recipients())
+from foods.models import Recipient
+from foods.serializers import RecipientSerializer
 
 
-@api_view(http_method_names=['GET'])
-def recipient_detail(request, pk):
-    recipients = get_recipients()
-
-    if pk == 0 or pk >= len(recipients):
-        raise Http404
-
-    return Response(recipients[pk - 1])
+class RecipientViewSet(ReadOnlyModelViewSet):
+    queryset = Recipient.objects.all()
+    serializer_class = RecipientSerializer
 
 
 @api_view(http_method_names=['GET'])

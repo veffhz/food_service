@@ -13,17 +13,6 @@ class Params:
     min_weight: Optional[int]
 
 
-def get_recipients() -> list:
-    return [_crop_recipient(recipient) for recipient in get_full_recipients()]
-
-
-def get_full_recipients() -> list:
-    try:
-        return requests.get(settings.RECIPIENTS_API_URL).json()
-    except requests.exceptions.RequestException:
-        raise RemoteServiceUnavailable()
-
-
 def get_full_products() -> list:
     try:
         return requests.get(settings.FOOD_API_URL).json()
@@ -61,13 +50,6 @@ def _parse(min_price: str, min_weight: str) -> Params:
                       int(min_weight) if min_weight else None)
     except ValueError:
         raise HttpBadRequest()
-
-
-def _crop_recipient(recipient: dict) -> dict:
-    return {
-        **recipient['info'],
-        'phoneNumber': recipient['contacts']['phoneNumber'],
-    }
 
 
 def _crop_product(product: dict) -> dict:

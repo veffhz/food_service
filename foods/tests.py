@@ -5,39 +5,46 @@ from django.urls import reverse
 from rest_framework import status
 from django.test import TestCase, Client
 
+from foods.models import Recipient
+from foods.serializers import RecipientSerializer
+
 client = Client()
 
 
-class GetAllRecipientsTest(TestCase):
-
-    first_recipient = {
-        'surname': 'Иванов',
-        'name': 'Иван',
-        'patronymic': 'Иванович',
-        'phoneNumber': '8-999-777-66-00'
-    }
+class GetRecipientsTest(TestCase):
 
     def setUp(self):
-        patcher = patch('requests.get')
-        self.mock_response = Mock(status_code=200)
-        self.mock_response.raise_for_status.return_value = None
-
-        with open('foods/data/recipients.json', 'r') as f:
-            self.mock_response.json.return_value = json.load(f)
-        self.mock_request = patcher.start()
-        self.mock_request.return_value = self.mock_response
+        self.first_recipient = Recipient.objects.create(
+            surname='Иванов',
+            name='Иван',
+            patronymic='Иванович',
+            phone_number='8-999-777-66-00'
+        )
+        self.second_recipient = Recipient.objects.create(
+            surname='Малейкина',
+            name='Лолита',
+            patronymic='Петровна',
+            phone_number='8-919-457-36-60'
+        )
 
     def test_get_all_recipients(self):
-        response = client.get(reverse('recipients-list'))
+        response = client.get(reverse('recipient-list'))
 
-        self.assertEqual(len(response.data), 15)
-        self.assertEqual(response.data[0], GetAllRecipientsTest.first_recipient)
+        recipients = Recipient.objects.all()
+        serializer = RecipientSerializer(recipients, many=True)
+
+        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_one_recipient(self):
-        response = client.get(reverse('recipient-detail', kwargs={'pk': 1}))
+        response = client.get(reverse(
+            'recipient-detail', kwargs={'pk': self.first_recipient.pk}
+        ))
 
-        self.assertEqual(response.data, GetAllRecipientsTest.first_recipient)
+        recipient = Recipient.objects.get(pk=self.first_recipient.pk)
+        serializer = RecipientSerializer(recipient)
+
+        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
