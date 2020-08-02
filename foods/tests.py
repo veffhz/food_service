@@ -1,17 +1,14 @@
-import json
-from unittest.mock import patch, Mock
-
 from django.urls import reverse
 from rest_framework import status
 from django.test import TestCase, Client
 
-from foods.models import Recipient
-from foods.serializers import RecipientSerializer
+from foods.models import Recipient, ProductSets
+from foods.serializers import RecipientSerializer, ProductSetsSerializer
 
 client = Client()
 
 
-class GetRecipientsTest(TestCase):
+class RecipientsTest(TestCase):
 
     def setUp(self):
         self.first_recipient = Recipient.objects.create(
@@ -28,7 +25,7 @@ class GetRecipientsTest(TestCase):
         )
 
     def test_get_all_recipients(self):
-        response = client.get(reverse('recipient-list'))
+        response = client.get(reverse('foods:recipient-list'))
 
         recipients = Recipient.objects.all()
         serializer = RecipientSerializer(recipients, many=True)
@@ -38,7 +35,7 @@ class GetRecipientsTest(TestCase):
 
     def test_get_one_recipient(self):
         response = client.get(reverse(
-            'recipient-detail', kwargs={'pk': self.first_recipient.pk}
+            'foods:recipient-detail', kwargs={'pk': self.first_recipient.pk}
         ))
 
         recipient = Recipient.objects.get(pk=self.first_recipient.pk)
@@ -48,49 +45,54 @@ class GetRecipientsTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-class GetAllProductsTest(TestCase):
-
-    first_product = {
-        'title': 'Семейная промо-коробка',
-        'description': ('Набор продуктов на каждый день. Если надоело думать над составом заказа, '
-                        'или вы у нас первый раз — это отличный выбор. Из этих продуктов можно '
-                        'приготовить больше 10 блюд на завтрак, обед или ужин. Сорта продуктов '
-                        'могут меняться, в зависимости от наличия товаров.'),
-        'price': 3000,
-        'weight': 9200
-    }
-
+class GetProductsTest(TestCase):
     def setUp(self):
-        patcher = patch('requests.get')
-        self.mock_response = Mock(status_code=200)
-        self.mock_response.raise_for_status.return_value = None
-
-        with open('foods/data/foodboxes.json', 'r') as f:
-            self.mock_response.json.return_value = json.load(f)
-        self.mock_request = patcher.start()
-        self.mock_request.return_value = self.mock_response
+        self.first_product = ProductSets.objects.create(
+            title='Семейная промо-коробка',
+            description=('Набор продуктов на каждый день. Если надоело думать над составом заказа, '
+                         'или вы у нас первый раз — это отличный выбор. Из этих продуктов можно '
+                         'приготовить больше 10 блюд на завтрак, обед или ужин. Сорта продуктов '
+                         'могут меняться, в зависимости от наличия товаров.'),
+            price=3000,
+            weight=9200
+        )
+        self.second_product = ProductSets.objects.create(
+            title='Фруктовая промо-коробка',
+            description=('Лучший вариант для первого заказа - коробка-сюрприз. '
+                         'В составе один крупный фрукт, несколько видов сезонных и экзотических фруктов, '
+                         'а также сухофрукты либо сладости.'),
+            price=2400,
+            weight=4500
+        )
 
     def test_get_all_products(self):
-        response = client.get(reverse('product-sets'))
+        response = client.get(reverse('foods:product-list'))
 
-        self.assertEqual(len(response.data), 15)
-        self.assertEqual(response.data[0], GetAllProductsTest.first_product)
+        product_sets = ProductSets.objects.all()
+        serializer = ProductSetsSerializer(product_sets, many=True)
+
+        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_all_products_with_price(self):
-        response = client.get(reverse('product-sets') + '?min_price=2000')
+        response = client.get(reverse('foods:product-list') + '?min_price=2500')
 
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_all_products_with_weight(self):
-        response = client.get(reverse('product-sets') + '?min_weight=5000')
+        response = client.get(reverse('foods:product-list') + '?min_weight=5000')
 
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_one_product(self):
-        response = client.get(reverse('product-detail', kwargs={'pk': 1}))
+        response = client.get(reverse(
+            'foods:product-detail', kwargs={'pk': self.first_product.pk}
+        ))
 
-        self.assertEqual(response.data, GetAllProductsTest.first_product)
+        product_set = ProductSets.objects.get(pk=self.first_product.pk)
+        serializer = ProductSetsSerializer(product_set)
+
+        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

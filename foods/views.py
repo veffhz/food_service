@@ -1,41 +1,27 @@
-from django.http import Http404
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from django_filters import filters
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
-from foods.api_helpers import (
-    get_products, get_product_by_id, get_products_by_param
-)
-
-from foods.models import Recipient
-from foods.serializers import RecipientSerializer
+from foods.models import Recipient, ProductSets
+from foods.serializers import RecipientSerializer, ProductSetsSerializer
 
 
-class RecipientViewSet(ReadOnlyModelViewSet):
+class RecipientViewSet(ModelViewSet):
     queryset = Recipient.objects.all()
     serializer_class = RecipientSerializer
 
 
-@api_view(http_method_names=['GET'])
-def product_sets(request):
-    if request.query_params:
-        min_price = request.query_params.get('min_price')
-        min_weight = request.query_params.get('min_weight')
+class ProductFilter(FilterSet):
+    min_price = filters.NumberFilter(field_name="price", lookup_expr='gte')
+    min_weight = filters.NumberFilter(field_name="weight", lookup_expr='gte')
 
-        if not min_price and not min_weight:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(get_products_by_param(min_price, min_weight))
-    else:
-        return Response(get_products())
+    class Meta:
+        model = ProductSets
+        fields = ['min_price', 'min_weight']
 
 
-@api_view(http_method_names=['GET'])
-def product_detail(request, pk):
-    product = get_product_by_id(pk)
-
-    if product:
-        return Response(product)
-    else:
-        raise Http404
+class ProductViewSet(ReadOnlyModelViewSet):
+    queryset = ProductSets.objects.all()
+    serializer_class = ProductSetsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
