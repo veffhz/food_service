@@ -1,9 +1,11 @@
-from rest_framework.serializers import HyperlinkedModelSerializer
+from phonenumbers import parse, is_valid_number, NumberParseException
+from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from foods.models import ProductSets, Recipient, Order
 
 
-class ProductSetsSerializer(HyperlinkedModelSerializer):
+class ProductSetsSerializer(ModelSerializer):
     class Meta:
         model = ProductSets
         fields = [
@@ -13,7 +15,7 @@ class ProductSetsSerializer(HyperlinkedModelSerializer):
         ]
 
 
-class RecipientSerializer(HyperlinkedModelSerializer):
+class RecipientSerializer(ModelSerializer):
     class Meta:
         model = Recipient
         fields = [
@@ -25,7 +27,34 @@ class RecipientSerializer(HyperlinkedModelSerializer):
         ]
 
 
-class OrderSerializer(HyperlinkedModelSerializer):
+class RecipientFullNameSerializer(ModelSerializer):
+    class Meta:
+        model = Recipient
+        fields = [
+            'name',
+            'patronymic',
+            'surname',
+        ]
+
+
+class RecipientPhoneSerializer(ModelSerializer):
+    def validate_phone_number(self, value): # noqa
+        try:
+            phone = parse(value, 'RU')
+            if not is_valid_number(phone):
+                raise NumberParseException(phone, '')
+        except NumberParseException:
+            raise serializers.ValidationError(f'{value} неверный формат номера!')
+        return value
+
+    class Meta:
+        model = Recipient
+        fields = [
+            'phone_number',
+        ]
+
+
+class OrderSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = [
@@ -36,4 +65,12 @@ class OrderSerializer(HyperlinkedModelSerializer):
             'recipient',
             'product_set',
             'status'
+        ]
+
+
+class OrderAddressSerializer(ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            'delivery_address',
         ]
