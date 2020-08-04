@@ -1,6 +1,6 @@
 Simple food service api with Django
 ==================  
-[![Heroku](https://heroku-badge.herokuapp.com/?app=foods-service&style=flat)](https://foods-service.herokuapp.com)
+[![Heroku](https://heroku-badge.herokuapp.com/?app=food-api-service&style=flat)](https://food-api-service.herokuapp.com)
 
 ##### features:
 * rest api for order food
