@@ -6,3 +6,4 @@ flake8==3.8.3
 dataclasses==0.7
 phonenumbers==8.12.6
 drf_yasg==1.17.1
+django-heroku==0.3.1
