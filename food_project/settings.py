@@ -34,6 +34,10 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%d-%m-%Y %H:%M",
 }
 
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
