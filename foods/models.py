@@ -13,6 +13,10 @@ class ProductSets(models.Model):
     def __str__(self):
         return f'{self.title}'
 
+    class Meta:
+        verbose_name = 'Набор'
+        verbose_name_plural = 'Наборы'
+
 
 class Recipient(models.Model):
     surname = models.CharField('Фамилия', max_length=50)
@@ -22,6 +26,10 @@ class Recipient(models.Model):
 
     def __str__(self):
         return f'{self.surname} {self.name}'
+
+    class Meta:
+        verbose_name = 'Получатель'
+        verbose_name_plural = 'Получатели'
 
 
 class StatusChoice(str, Enum):
@@ -70,3 +78,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Заказ {self.pk}'
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
