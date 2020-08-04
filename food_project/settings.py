@@ -8,9 +8,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-FOOD_API_URL = 'https://stepik.org/media/attachments/course/73594/foodboxes.json'
-RECIPIENTS_API_URL = 'https://stepik.org/media/attachments/course/73594/recipients.json'
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
