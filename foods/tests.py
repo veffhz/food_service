@@ -30,7 +30,7 @@ class RecipientsTest(TestCase):
         recipients = Recipient.objects.all()
         serializer = RecipientSerializer(recipients, many=True)
 
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.data['results'], serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_one_recipient(self):
@@ -71,19 +71,19 @@ class GetProductsTest(TestCase):
         product_sets = ProductSets.objects.all()
         serializer = ProductSetsSerializer(product_sets, many=True)
 
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.data['results'], serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_all_products_with_price(self):
         response = client.get(reverse('foods:product-list') + '?min_price=2500')
 
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_all_products_with_weight(self):
         response = client.get(reverse('foods:product-list') + '?min_weight=5000')
 
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_one_product(self):

@@ -12,10 +12,21 @@ class ProductSetsSerializer(ModelSerializer):
             'id',
             'title',
             'description',
+            'price',
+            'weight'
         ]
 
 
 class RecipientSerializer(ModelSerializer):
+    def validate_phone_number(self, value): # noqa
+        try:
+            phone = parse(value, 'RU')
+            if not is_valid_number(phone):
+                raise NumberParseException(phone, '')
+        except NumberParseException:
+            raise serializers.ValidationError(f'{value} неверный формат номера!')
+        return value
+
     class Meta:
         model = Recipient
         fields = [
@@ -37,18 +48,8 @@ class RecipientFullNameSerializer(ModelSerializer):
         ]
 
 
-class RecipientPhoneSerializer(ModelSerializer):
-    def validate_phone_number(self, value): # noqa
-        try:
-            phone = parse(value, 'RU')
-            if not is_valid_number(phone):
-                raise NumberParseException(phone, '')
-        except NumberParseException:
-            raise serializers.ValidationError(f'{value} неверный формат номера!')
-        return value
-
-    class Meta:
-        model = Recipient
+class RecipientPhoneSerializer(RecipientSerializer):
+    class Meta(RecipientSerializer.Meta):
         fields = [
             'phone_number',
         ]
@@ -57,6 +58,7 @@ class RecipientPhoneSerializer(ModelSerializer):
 class OrderSerializer(ModelSerializer):
     class Meta:
         model = Order
+        read_only_fields = ['status', 'order_created_datetime', 'delivery_datetime']
         fields = [
             'id',
             'order_created_datetime',
@@ -64,7 +66,7 @@ class OrderSerializer(ModelSerializer):
             'delivery_address',
             'recipient',
             'product_set',
-            'status'
+            'status',
         ]
 
 

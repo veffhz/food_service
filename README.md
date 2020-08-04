@@ -1,8 +1,7 @@
 ### Simple food service api with Django
 
 ##### features:
-* rest api for foods
-* rest api from recipients
+* rest api for order foods
 
 ##### requirements:
  - Python 3.6+
@@ -22,5 +21,4 @@
  - `gunicorn food_project.wsgi`
 
 ##### usage:
- - http://localhost:8000/recipients/
- - http://localhost:8000/product-sets/
+ - swagger http://127.0.0.1:8000/swagger/

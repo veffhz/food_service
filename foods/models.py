@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from enum import Enum
 
 from django.db import models
@@ -23,7 +24,7 @@ class Recipient(models.Model):
         return f'{self.surname} {self.name}'
 
 
-class StatusChoice(Enum):
+class StatusChoice(str, Enum):
     CREATED = 'created'
     DELIVERED = 'delivered'
     PROCESSED = 'processed'
@@ -31,7 +32,7 @@ class StatusChoice(Enum):
 
     @classmethod
     def choices(cls):
-        return [(status, status.value) for status in cls]
+        return [(status, status.value) for status in cls if isinstance(status, StatusChoice)]
 
 
 class Order(models.Model):
@@ -40,7 +41,7 @@ class Order(models.Model):
     )
 
     delivery_datetime = models.DateTimeField(
-        'Дата и время доставки', null=True
+        'Дата и время доставки', null=True, blank=True
     )
 
     delivery_address = models.CharField('Адрес доставки', max_length=50)
@@ -53,6 +54,19 @@ class Order(models.Model):
 
     status = models.CharField('Статус', max_length=20, default=StatusChoice.CREATED,
                               choices=StatusChoice.choices())
+
+    def cancel_order(self):
+        self.status = StatusChoice.CANCELLED
+        self.save()
+
+    def process_order(self):
+        self.status = StatusChoice.PROCESSED
+        self.save()
+
+    def complete_order(self):
+        self.status = StatusChoice.DELIVERED
+        self.delivery_datetime = now()
+        self.save()
 
     def __str__(self):
         return f'Заказ {self.pk}'
