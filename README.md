@@ -1,6 +1,6 @@
 ### Simple food service api with Django
 ==================
-[![Heroku](https://heroku-badge.herokuapp.com/?app=foods-service&style=flat)](https://foods-service.herokuapp.com/swagger/)
+[![Heroku](https://heroku-badge.herokuapp.com/?app=foods-service&style=flat)](https://foods-service.herokuapp.com)
 
 ##### features:
 * rest api for order food
@@ -23,5 +23,5 @@
  - `gunicorn food_project.wsgi`
 
 ##### usage:
- - swagger http://127.0.0.1:8000/swagger/
+ - swagger http://127.0.0.1:8000/
  - admin http://127.0.0.1:8000/admin/ (admin/admin)
