@@ -40,7 +40,7 @@ class CustomModelViewSet(mixins.CreateModelMixin,
     http_method_names = ['get', 'post', 'patch', 'delete', 'head']
 
     def update(self, *args, **kwargs):
-        raise MethodNotAllowed("POST", detail="Use PATCH")
+        raise MethodNotAllowed("PUT", detail="Use PATCH")
 
 
 class OrderModelViewSet(mixins.CreateModelMixin,
@@ -49,6 +49,3 @@ class OrderModelViewSet(mixins.CreateModelMixin,
                         mixins.ListModelMixin,
                         GenericViewSet):
     http_method_names = ['get', 'post', 'patch', 'head']
-
-    def update(self, *args, **kwargs):
-        raise MethodNotAllowed("POST", detail="Use PATCH")

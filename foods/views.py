@@ -7,18 +7,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from foods.models import Recipient, ProductSets, Order
 from foods.view_helper import (
-    ProductFilter,
-    CustomModelViewSet,
-    OrderModelViewSet,
-    OrderFilter
+    ProductFilter, CustomModelViewSet, OrderModelViewSet, OrderFilter
 )
 from foods.serializers import (
-    RecipientSerializer,
-    ProductSetsSerializer,
-    OrderSerializer,
-    RecipientFullNameSerializer,
-    RecipientPhoneSerializer,
-    OrderAddressSerializer
+    RecipientSerializer, ProductSetsSerializer, OrderSerializer,
+    RecipientFullNameSerializer, RecipientPhoneSerializer, OrderAddressSerializer
 )
 
 
